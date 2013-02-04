@@ -232,6 +232,7 @@ int hexbright::freeRam () {
 }
 #endif
 
+#ifdef ACCELEROMETER
 ///////////////////////////////////////////////
 ///////////////////Filters/////////////////////
 ///////////////////////////////////////////////
@@ -280,6 +281,7 @@ inline int hexbright::stdev_filter3(int last_estimate, int current_reading) {
     probability = 70;
   return (probability*last_estimate + (100-probability)*current_reading)/100;
 }
+#endif // ACCELEROMETER
 
 ///////////////////////////////////////////////
 ////////////////LIGHT CONTROL//////////////////
@@ -1190,7 +1192,7 @@ void hexbright::shutdown() {
 ///////////////////////////////////////////////
 //KLUDGE BECAUSE ARDUINO DOESN'T SUPPORT CLASS VARIABLES/INSTANTIATION
 ///////////////////////////////////////////////
-
+#ifdef ACCELEROMETER
 void hexbright::fake_read_accelerometer(int* new_vector) {
   next_vector();
   for(int i=0; i<3; i++) {
@@ -1198,4 +1200,4 @@ void hexbright::fake_read_accelerometer(int* new_vector) {
     //vector(0)[i] = new_vector[i];
   }
 }
-
+#endif

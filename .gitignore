@@ -6,3 +6,5 @@
 *.bin
 *.core
 *.stackdump
+
+.DS_Store
