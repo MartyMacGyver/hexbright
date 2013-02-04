@@ -1012,6 +1012,7 @@ unsigned int hexbright::get_input_digit() {
   return read_value;
 }
 
+#ifdef ACCELEROMETER
 void hexbright::input_digit(unsigned int min_digit, unsigned int max_digit) {
   unsigned int tmp2 = 999 - atan2(vector(0)[0], vector(0)[2])*159 - 500; // scale from 0-999, counterclockwise = higher
   tmp2 = (tmp2*(max_digit-min_digit))/1000+min_digit;
@@ -1025,6 +1026,7 @@ void hexbright::input_digit(unsigned int min_digit, unsigned int max_digit) {
   }
   read_value = tmp2; 
 }
+#endif
 #endif
 
 ///////////////////////////////////////////////
