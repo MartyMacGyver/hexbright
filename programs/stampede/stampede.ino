@@ -16,8 +16,10 @@ int current_brightness = MAX_LEVEL;
 bool debug = false;
 
 // Do we need to switch modes?
-bool switchMode = false;
-bool brightnessChanged = false;
+bool switchMode = false;            // Do we need to update our current mode?
+bool brightnessChanged = false;     // Are we just changing brightness?
+bool scaleBackwards = false;        // Do we need to scale brightness in
+                                    // the opposite direction?
 
 void setup() {
   hb.init_hardware();
@@ -29,15 +31,29 @@ void loop() {
   // Brightness scale change
   if (hb.button_pressed() && hb.button_pressed_time() > 500) {
     if (mode == ON_MODE && hb.button_pressed()) {
-      if (current_brightness >= 50) {
+      if (current_brightness >= 50 && current_brightness <= MAX_LEVEL) {
         hb.set_light(CURRENT_LEVEL, current_brightness, 1);
-        current_brightness -= 5;
+        if (!scaleBackwards)
+          current_brightness -= 4;
+        else
+          current_brightness += 4;
+      } else {
+        if (scaleBackwards) {
+          scaleBackwards = false;
+          if (!hb.low_voltage_state())
+            current_brightness = MAX_LEVEL;
+          else
+            current_brightness = MAX_LOW_LEVEL;
+        } else {
+          scaleBackwards = true;
+          current_brightness = 50;
+        }
       }
       brightnessChanged = true;
     }
   }
   
-  if (hb.button_just_released() && hb.button_pressed_time() > 115) {
+  if (hb.button_just_released()) {
     switch (mode) {
       case OFF_MODE:
         mode = ON_MODE;
