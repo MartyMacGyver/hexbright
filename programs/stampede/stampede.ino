@@ -7,15 +7,13 @@ hexbright hb;
 #define OFF_MODE 0
 #define ON_MODE 1
 #define SEIZURE_MODE 2
+#define AIRPLANE_MODE 3
 
 // Current flashlight state
 int mode = OFF_MODE;
 int current_brightness = MAX_LEVEL;
 
-// Debugging Mode
-bool debug = false;
-
-// Do we need to switch modes?
+// State Flags
 bool switchMode = false;            // Do we need to update our current mode?
 bool brightnessChanged = false;     // Are we just changing brightness?
 bool scaleBackwards = false;        // Do we need to scale brightness in
@@ -27,6 +25,16 @@ void setup() {
 
 void loop() {
   hb.update();
+  
+  // Airplane Mode
+  if (hb.button_pressed() && hb.button_pressed_time() > 1500) {
+    if (mode == OFF_MODE) {
+#if (DEBUG == DEBUG_PRINT)
+      Serial.println("*** Switch Airplane Mode ***");
+#endif
+      mode = AIRPLANE_MODE;
+    }
+  }
   
   // Brightness scale change
   if (hb.button_pressed() && hb.button_pressed_time() > 500) {
@@ -68,28 +76,41 @@ void loop() {
           brightnessChanged = false;
         }
         break;
+      case AIRPLANE_MODE:
+        mode = OFF_MODE;
+        break;
     }
   }
   
   if (switchMode) {
     switch (mode) {
       case ON_MODE:
-        if (hb.low_voltage_state() && hb.get_max_light_level() > MAX_LOW_LEVEL)
+        if (hb.low_voltage_state() && current_brightness > MAX_LOW_LEVEL)
           hb.set_light(CURRENT_LEVEL, MAX_LOW_LEVEL, 5);
         else
           hb.set_light(CURRENT_LEVEL, current_brightness, 5);
         break;
       case OFF_MODE:
         hb.set_light(CURRENT_LEVEL, OFF_LEVEL, 5);
-        current_brightness = MAX_LEVEL;
+        if (!hb.low_voltage_state())
+          current_brightness = MAX_LEVEL;
+        else
+          current_brightness = MAX_LOW_LEVEL;
         break;
     }
     switchMode = false;
   }
   
-  if (debug)
+  // If in low voltage state, blink red LED to signal low battery
+  if (hb.low_voltage_state() && hb.get_led_state(RLED) == LED_OFF) {
+    if (mode == ON_MODE)    // But only do this if the light is on
+      hb.set_led(RLED, 50, 5000);    // Blink for 50ms every 5000ms
+  }
+  
+  // Flash red when recharging and go solid green when full
+  if (hb.get_charge_state() == CHARGING)
     hb.print_charge(RLED);
-  else
-    hb.print_charge(GLED);
+  else if (hb.get_charge_state() != BATTERY)
+    hb.set_led(GLED, 50);
 }
 
