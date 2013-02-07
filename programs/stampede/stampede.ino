@@ -18,6 +18,7 @@ bool switchMode = false;            // Do we need to update our current mode?
 bool brightnessChanged = false;     // Are we just changing brightness?
 bool scaleBackwards = false;        // Do we need to scale brightness in
                                     // the opposite direction?
+bool doStrobe = false;
 
 void setup() {
   hb.init_hardware();
@@ -33,6 +34,17 @@ void loop() {
       Serial.println("*** Switch Airplane Mode ***");
 #endif
       mode = AIRPLANE_MODE;
+    }
+  }
+  
+  // Enable seizure mode
+  if (hb.button_released_time() > 50 && hb.button_released_time() < 250) {
+    if (hb.button_just_pressed()) {
+      if (mode != SEIZURE_MODE)
+        mode = SEIZURE_MODE;
+      else
+        mode = OFF_MODE;
+        doStrobe = false;
     }
   }
   
@@ -76,6 +88,10 @@ void loop() {
           brightnessChanged = false;
         }
         break;
+      case SEIZURE_MODE:
+        if (!doStrobe)
+          switchMode = true;
+        break;
       case AIRPLANE_MODE:
         mode = OFF_MODE;
         break;
@@ -97,8 +113,22 @@ void loop() {
         else
           current_brightness = MAX_LOW_LEVEL;
         break;
+      case SEIZURE_MODE:
+        doStrobe = true;
+        break;
     }
     switchMode = false;
+  }
+  
+  if (doStrobe) {
+    static unsigned long flash_time = millis();
+    if(flash_time+70<millis()) { // flash every 70 milliseconds
+      flash_time = millis(); // reset flash_time
+      if (!hb.low_voltage_state())
+        hb.set_light(MAX_LEVEL, 0, 20);
+      else
+        hb.set_light(MAX_LOW_LEVEL, 0, 20);
+    }
   }
   
   // If in low voltage state, blink red LED to signal low battery
@@ -108,9 +138,9 @@ void loop() {
   }
   
   // Flash red when recharging and go solid green when full
-  if (hb.get_charge_state() == CHARGING)
-    hb.print_charge(RLED);
-  else if (hb.get_charge_state() != BATTERY)
+  if (hb.get_charge_state() == CHARGING && hb.get_led_state(RLED) == LED_OFF)
+    hb.set_led(RLED, 500, 750);
+  else if (hb.get_charge_state() == CHARGED)
     hb.set_led(GLED, 50);
 }
 
