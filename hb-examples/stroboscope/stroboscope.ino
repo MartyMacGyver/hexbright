@@ -1,11 +1,15 @@
-// uncomment (delete // before) '#define STROBE' in hexbright.h
+#include <strobe.h>
+#include <print_number.h>
+
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
-#include <Wire.h>
 
 hexbright hb;
 
 void setup() {
-  hb.init_hardware(); 
+  hb.init_hardware();
+  hb.set_light(0,0,NOW); // don't turn off if we don't use set_light
 }
 
 unsigned int fpm;
@@ -16,7 +20,7 @@ int mode = OFF_MODE;
 
 void loop() {
   hb.update();
-  
+
   if(mode==OFF_MODE) {
     if(hb.button_pressed_time()<200 && hb.button_just_released()) {
       fpm = 2000;
@@ -26,7 +30,7 @@ void loop() {
   if(mode==STROBE_MODE) {
     // turn off?
     if (hb.button_pressed_time()>200) {
-      hb.set_strobe_delay(STROBE_OFF);
+      set_strobe_delay(STROBE_OFF); // if this line doesn't compile, uncomment STROBE in hexbright.h
       hb.set_light(CURRENT_LEVEL, OFF_LEVEL, NOW);
       mode = OFF_MODE;
       return;
@@ -43,7 +47,7 @@ void loop() {
       } while (Serial.available()>0);
     if(buffer>0) {
       fpm = buffer;
-      hb.set_strobe_fpm(buffer);
+      set_strobe_fpm(buffer);
     }
     
     char spin = hb.get_spin();
@@ -53,13 +57,13 @@ void loop() {
       else
         fpm /= 1+spin/200.0; 
       //Serial.println(avg_spin);
-      hb.set_strobe_fpm(fpm);
+      set_strobe_fpm(fpm);
     }
     
-    if(!hb.printing_number()) {
-      Serial.println(hb.get_strobe_fpm());
-      Serial.println(hb.get_strobe_error());
-      hb.print_number(hb.get_strobe_fpm());
+    if(!printing_number()) {
+      Serial.println(get_strobe_fpm());
+      Serial.println(get_strobe_error());
+      print_number(get_strobe_fpm());
     }
   }
 }

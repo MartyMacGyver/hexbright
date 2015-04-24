@@ -1,5 +1,6 @@
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
-#include <Wire.h>
 
 hexbright hb;
 

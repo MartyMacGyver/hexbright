@@ -27,8 +27,13 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 */
 
+#include <print_power.h>
+#include <print_number.h>
+#include <input_digit.h>
+
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
-#include <Wire.h>
 #include <Time.h>
 
 hexbright hb;
@@ -52,8 +57,8 @@ int action_mode = OFF_MODE;
 #define PLACES 3
 const int time[] = {12, 6, 10}; // 0-11 hours, 0-50 minutes, 0-9 minutes
 char place = 0; // hours, minutes or seconds?
-unsigned int action_time = 0; // HHMM
-unsigned int previous_action_time = 0; // HHMM
+unsigned int action_time = 0; // set a default (accessible via short clicks) in HHMM
+unsigned int previous_action_time = 0;
 int action_light_level = 0;
 
 int brightness_level = 0;
@@ -69,8 +74,8 @@ void loop() {
       // nothing's happening, turn off
       hb.set_light(CURRENT_LEVEL, OFF_LEVEL, NOW);
       // or print charge state if we're plugged in
-      if(!hb.printing_number()) {
-        hb.print_charge(GLED);
+      if(!printing_number()) {
+        print_charge(GLED);
       }
     } else if (action_mode == WAIT_MODE) {
       // we are waiting to do something
@@ -79,9 +84,9 @@ void loop() {
         action_mode=OFF_MODE;
       } else {
         // display our current wait time...
-        if(!hb.printing_number()) {
+        if(!printing_number()) {
           // print hours and minutes remaining
-          hb.print_number(action_time_remaining(action_time));
+          print_number(action_time_remaining(action_time));
         }
       }
     }
@@ -130,9 +135,9 @@ void loop() {
     }
     break;
   case SET_ACTION_MODE:
-    hb.input_digit(action_time*10, action_time*10+time[place]);
+    input_digit(action_time*10, action_time*10+time[place]);
     if(hb.button_just_released() && hb.button_pressed_time()>300) {
-      action_time = hb.get_input_digit();
+      action_time = get_input_digit();
       place++;
     } else if (hb.button_just_released() && hb.button_pressed_time()<300) {
       // use the value from the last timer (0 on the first run)
@@ -141,10 +146,10 @@ void loop() {
         action_time = (previous_action_time/100)*100;
         break;
       case 1: // greater minutes
-        action_time = (previous_action_time/10)*10 % 100;
+        action_time += (previous_action_time/10)*10 % 100;
         break;
       case 2: // lesser minutes
-        action_time = previous_action_time % 10;
+        action_time += previous_action_time % 10;
         break;
       }
       

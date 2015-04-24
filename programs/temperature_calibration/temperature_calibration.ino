@@ -27,17 +27,21 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 */
 
+#include <print_number.h>
+
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
-#include <Wire.h>
 
 // Usage notes are in the readme file in this same directory.
 hexbright hb;
 
 void setup() {
   hb.init_hardware();
+  hb.set_light(0,0,NOW); // stay on, because we want the temperature output
 }
 
-int brightness = 1000;
+int brightness = 0;
 
 void loop() {
   hb.update();
@@ -47,8 +51,8 @@ void loop() {
     hb.set_light(CURRENT_LEVEL, brightness, 50);
   }
   
-  if(!hb.printing_number()) {
-    hb.print_number(hb.get_thermal_sensor());
+  if(!printing_number()) {
+    print_number(hb.get_thermal_sensor());
 //    hb.print_number(hb.get_fahrenheit());
   }
 }

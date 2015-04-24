@@ -1,6 +1,7 @@
-#include <Wire.h>
+#include <print_power.h>
 
-// uncomment #ACCELEROMETER in hexbright.h
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
 
 hexbright hb;
@@ -23,7 +24,7 @@ void loop() {
   } else if (hb.button_pressed_time()>1000) {
     level = 0;
     mode = OFF_MODE;
-    hb.set_light_level(CURRENT_LEVEL, OFF_LEVEL, NOW);
+    hb.set_light(CURRENT_LEVEL, OFF_LEVEL, NOW);
   }
   
   if(mode==WAND_MODE) {
@@ -48,6 +49,6 @@ void loop() {
     }
     last_dp = dp;
   } else if (mode==OFF_MODE) {
-    hb.print_charge(GLED);
+    print_power();
   } 
 }

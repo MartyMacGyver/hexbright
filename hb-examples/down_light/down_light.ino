@@ -26,10 +26,11 @@ The views and conclusions contained in the software and documentation are those
 of the authors and should not be interpreted as representing official policies, 
 either expressed or implied, of the FreeBSD Project.
 */
+#include <print_power.h>
 
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
-
-#include <Wire.h>
 
 hexbright hb;
 
@@ -73,5 +74,5 @@ void loop() {
        hb.set_light(CURRENT_LEVEL, 200, 50);
     } 
   }
-  hb.print_charge(GLED);
+  print_power();
 }

@@ -1,5 +1,7 @@
-#include <Wire.h>
-// uncomment '#define ACCELEROMETER' in hexbright.h
+#include <print_binary.h>
+
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
 
 
@@ -52,23 +54,7 @@ void loop() {
 
 
 
-void print_binary(int value) {
-  String s = String(value, BIN);
 
-  while(s.length()<16) {
-    s = "0"+s;
-  }
-  Serial.println(s);
-}
-
-void print_binary(byte value) {
-  String s = String(value, BIN);
-
-  while(s.length()<8) {
-    s = "0"+s;
-  }
-  Serial.println(s);
-}
 
 
 /*double sqrt_sqr(int vector) {

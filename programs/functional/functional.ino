@@ -26,12 +26,13 @@ The views and conclusions contained in the software and documentation are those
 of the authors and should not be interpreted as representing official policies, 
 either expressed or implied, of the FreeBSD Project.
 */
+#include <print_power.h>
+#include <print_number.h>
 
+// These next two lines must come after all other library #includes
+#define BUILD_HACK
 #include <hexbright.h>
 
-#include <Wire.h>
-
-// number of milliseconds between updates
 #define OFF_MODE 0
 #define BLINKY_MODE 1
 #define CYCLE_MODE 2
@@ -51,9 +52,7 @@ void loop() {
 
   //// Button actions to recognize, one-time actions to take as a result
   if(hb.button_just_released()) {
-    if(hb.button_pressed_time()<=9) {
-      // ignore, could be a bounce
-    } else if(hb.button_pressed_time()<300) { //<300 milliseconds
+    if(hb.button_pressed_time()<300) { //<300 milliseconds
       mode = CYCLE_MODE;
       int levels[] = {1,250,500,750,1000};
       brightness_level = (brightness_level+1)%5;
@@ -79,12 +78,12 @@ void loop() {
     }
     i--;
   } else if (mode == CYCLE_MODE) { // print the current flashlight temperature
-    if(!hb.printing_number()) {
-      hb.print_number(hb.get_fahrenheit());
+    if(!printing_number()) {
+      print_number(hb.get_fahrenheit());
     }
   } else if (mode == OFF_MODE) { // charging, or turning off
-    if(!hb.printing_number()) {
-      hb.print_charge(GLED);
+    if(!printing_number()) {
+      print_charge(GLED);
     }
   }
 }
