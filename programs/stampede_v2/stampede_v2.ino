@@ -14,10 +14,12 @@ hexbright hb;
 #define AIRPLANE_MODE 2
 
 // Current flashlight state
-int current_brightness = MAX_LEVEL;
+//int current_brightness = MAX_LEVEL;
+// set current brightness to half brightness for now to make it so not rediculously bright when turning on
+int current_brightness = 500;
 
 // State Flags
-bool scaleBackwards = false;        // Do we need to scale brightness in
+bool scaleBackwards = true;        // Do we need to scale brightness in
                                     // the opposite direction?
 
 void setup() {
@@ -89,30 +91,66 @@ void do_strobe() {
   if(flash_time+70<millis()) { // flash every 70 milliseconds
     flash_time = millis(); // reset flash_time
     if (!hb.low_voltage_state())
-      hb.set_light(MAX_LEVEL, 0, 20);
+      hb.set_light(MAX_LEVEL, 0, 10);
     else
-      hb.set_light(MAX_LOW_LEVEL, 0, 20);
+      hb.set_light(MAX_LOW_LEVEL, 0, 10);
   }
 }
 
 // Function to scale the light brightness
+//void scale_brightness() {
+//  if (current_brightness >= 50 && current_brightness <= MAX_LEVEL) {
+//    hb.set_light(CURRENT_LEVEL, current_brightness, 1);
+//    if (!scaleBackwards)
+//      current_brightness -= 4;
+//    else
+//      current_brightness += 4;
+//  } else {
+//    if (scaleBackwards) {
+//      scaleBackwards = false;
+//      if (!hb.low_voltage_state())
+//        current_brightness = MAX_LEVEL;
+//      else
+//        current_brightness = MAX_LOW_LEVEL;
+//    } else {
+//      scaleBackwards = true;
+//      current_brightness = 50;
+//    }
+//  }
+//}
+
 void scale_brightness() {
-  if (current_brightness >= 50 && current_brightness <= MAX_LEVEL) {
-    hb.set_light(CURRENT_LEVEL, current_brightness, 1);
-    if (!scaleBackwards)
-      current_brightness -= 4;
-    else
-      current_brightness += 4;
-  } else {
-    if (scaleBackwards) {
-      scaleBackwards = false;
-      if (!hb.low_voltage_state())
-        current_brightness = MAX_LEVEL;
+  if (hb.low_voltage_state()) {
+    if (current_brightness >= 50 && current_brightness <= MAX_LOW_LEVEL) {
+      hb.set_light(CURRENT_LEVEL, current_brightness, 1);
+      if (!scaleBackwards)
+        current_brightness -= 4;
       else
-        current_brightness = MAX_LOW_LEVEL;
+        current_brightness += 4;
     } else {
-      scaleBackwards = true;
-      current_brightness = 50;
+      if (scaleBackwards) {
+        scaleBackwards = false;
+        current_brightness = MAX_LOW_LEVEL;
+      } else {
+        scaleBackwards = true;
+        current_brightness = 50;
+      }
+    }
+  } else {
+    if (current_brightness >= 50 && current_brightness <= MAX_LEVEL) {
+      hb.set_light(CURRENT_LEVEL, current_brightness, 1);
+      if (!scaleBackwards)
+        current_brightness -= 4;
+      else
+        current_brightness += 4;
+    } else {
+      if (scaleBackwards) {
+        scaleBackwards = false;
+        current_brightness = MAX_LEVEL;
+      } else {
+        scaleBackwards = true;
+        current_brightness = 50;
+      }
     }
   }
 }
@@ -122,14 +160,14 @@ int change_mode(const int newMode) {
   switch (newMode) {
     case ON_MODE:
       if (hb.low_voltage_state() && current_brightness > MAX_LOW_LEVEL)
-        hb.set_light(CURRENT_LEVEL, MAX_LOW_LEVEL, 5);
+        hb.set_light(CURRENT_LEVEL, MAX_LOW_LEVEL, 250);
       else
-        hb.set_light(CURRENT_LEVEL, current_brightness, 5);
+        hb.set_light(CURRENT_LEVEL, current_brightness, 250);
       break;
     case OFF_MODE:
-      hb.set_light(CURRENT_LEVEL, OFF_LEVEL, 5);
+      hb.set_light(CURRENT_LEVEL, OFF_LEVEL, 250);
       if (!hb.low_voltage_state())
-        current_brightness = MAX_LEVEL;
+        current_brightness = 500;
       else
         current_brightness = MAX_LOW_LEVEL;
       break;
@@ -148,8 +186,10 @@ void display_battery_low() {
 // Function to display charging state.
 void display_charge() {
   // Flash red when recharging and go solid green when full
-  if (hb.get_charge_state() == CHARGING && hb.get_led_state(RLED) == LED_OFF)
-    hb.set_led(RLED, 500, 750);
+  if (hb.get_charge_state() == CHARGING)
+  //if (hb.get_charge_state() == CHARGING && hb.get_led_state(RLED) == LED_OFF)
+    //hb.set_led(RLED, 500, 750);
+    hb.set_led(RLED, 50);
   else if (hb.get_charge_state() == CHARGED)
     hb.set_led(GLED, 50);
 }

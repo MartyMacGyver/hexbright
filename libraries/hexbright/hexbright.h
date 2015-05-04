@@ -53,14 +53,10 @@ either expressed or implied, of the FreeBSD Project.
 
 /// Some space-saving options
 #define LED // comment out save 786 bytes if you don't use the rear LEDs
-<<<<<<< HEAD
 //#define PRINT_NUMBER // comment out to save 626 bytes if you don't need to print numbers (but need the LEDs)
 //#define ACCELEROMETER //comment out to save 1500 bytes if you don't need the accelerometer
-=======
-#define ACCELEROMETER //comment out to save 1500 bytes if you don't need the accelerometer
->>>>>>> upstream/master
-#define FLASH_CHECKSUM // comment out to save 56 bytes when in debug mode
-#define FREE_RAM // comment out to save 146 bytes when in debug mode
+//#define FLASH_CHECKSUM // comment out to save 56 bytes when in debug mode
+//#define FREE_RAM // comment out to save 146 bytes when in debug mode
 
 
 // The above #defines can help if you are running out of flash.  If you are having weird lockups,
