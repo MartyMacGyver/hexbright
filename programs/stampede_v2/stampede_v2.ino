@@ -12,11 +12,14 @@ hexbright hb;
 #define OFF_MODE 0
 #define ON_MODE 1
 #define AIRPLANE_MODE 2
+#define LOW_POWER 3
 
 // Current flashlight state
 //int current_brightness = MAX_LEVEL;
 // set current brightness to half brightness for now to make it so not rediculously bright when turning on
 int current_brightness = 500;
+int onTime = 0;
+int lowPowerTime = 0;
 
 // State Flags
 bool scaleBackwards = true;        // Do we need to scale brightness in
@@ -65,6 +68,11 @@ void loop() {
       case ON_MODE:
         mode = change_mode(OFF_MODE);
         break;
+      case LOW_POWER:
+        lowPowerTime = 0;
+        onTime = millis();
+        mode = change_mode(ON_MODE);
+        break;
     }
   }
   
@@ -83,6 +91,18 @@ void loop() {
     display_battery_low();
   
   display_charge();
+  
+  // Check to see if we are in low power mode, and if we are
+  // change it to off after being in low power for 2 minutes
+  if (mode == LOW_POWER && millis() >= lowPowerTime + 120000) {
+    mode = change_mode(OFF_MODE);
+  }
+  
+  // check to see if light has been on for 5 mins
+  // if it has, put it into low power mode
+  if (millis() >= onTime + 300000 && mode == ON_MODE) {
+    mode = change_mode(LOW_POWER);
+  }
 }
 
 // Function to strobe the light
@@ -163,6 +183,8 @@ int change_mode(const int newMode) {
         hb.set_light(CURRENT_LEVEL, MAX_LOW_LEVEL, 250);
       else
         hb.set_light(CURRENT_LEVEL, current_brightness, 250);
+      onTime = millis();
+      lowPowerTime = 0;
       break;
     case OFF_MODE:
       hb.set_light(CURRENT_LEVEL, OFF_LEVEL, 250);
@@ -170,6 +192,11 @@ int change_mode(const int newMode) {
         current_brightness = 500;
       else
         current_brightness = MAX_LOW_LEVEL;
+      break;
+    case LOW_POWER:
+      onTime = 0;
+      lowPowerTime = millis();
+      hb.set_light(CURRENT_LEVEL, 0, 1);
       break;
   }
   return newMode;
