@@ -13,18 +13,6 @@ hexbright.upload.protocol=arduino
 hexbright.upload.speed=19200
 
 ##############################################################
-hexbright.menu.target.release=Release
-hexbright.menu.target.release.build.extra_flags=
-
-##############################################################
-hexbright.menu.target.debug=Debug (-D DEBUG)
-hexbright.menu.target.debug.build.extra_flags=-D DEBUG
-
-##############################################################
-hexbright.menu.target.debug1=Debug (-D DEBUG=DEBUG_PROGRAM)
-hexbright.menu.target.debug1.build.extra_flags=-D DEBUG=DEBUG_PROGRAM
-
-##############################################################
 hexbright.menu.core.hexbright_std=Standard (ATMega168)
 hexbright.menu.core.hexbright_std.build.mcu=atmega168
 hexbright.menu.core.hexbright_std.build.f_cpu=8000000L
@@ -45,5 +33,13 @@ hexbright.menu.core.hexbright_tiny.bootloader.high_fuses=0xdd
 hexbright.menu.core.hexbright_tiny.bootloader.extended_fuses=0x02
 hexbright.menu.core.hexbright_tiny.bootloader.unlock_bits=0x3F
 hexbright.menu.core.hexbright_tiny.bootloader.lock_bits=0x0F
+
+##############################################################
+hexbright.menu.target.release=Release (no debug)
+hexbright.menu.target.release.build.extra_flags=
+
+##############################################################
+hexbright.menu.target.debug_prog=Debug (-D DEBUG=DEBUG_PROGRAM)
+hexbright.menu.target.debug_prog.build.extra_flags=-D DEBUG=DEBUG_PROGRAM
 
 ##############################################################
