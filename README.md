@@ -12,7 +12,7 @@ Key Features
 
 *   All hardware management is done internal to the library; you can focus on firmware features, not implementation.
 
-*   Multiple debug modes to help diagnose problems ([DEBUG in hexbright.h](https://github.com/dhiltonp/hexbright/blob/master/libraries/hexbright/hexbright.h#L71))
+*   Multiple debug modes to help diagnose problems (Delect the DEBUG target or see [DEBUG in hexbright.h](https://github.com/dhiltonp/hexbright/blob/master/libraries/hexbright/hexbright.h#L71))
 
 Overview
 -----------------
